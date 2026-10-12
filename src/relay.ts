@@ -2,6 +2,7 @@ import { type Api, type Context, InlineKeyboard } from "grammy";
 import { config } from "./config.js";
 import * as db from "./db.js";
 import { t } from "./i18n.js";
+import { mascot } from "./mascot.js";
 
 export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const STAFF = config.STAFF_CHAT_ID;
@@ -65,9 +66,9 @@ export async function closeAndNotify(api: Api, ticket: db.Ticket, closedBy: stri
   const lang = langOf(ticket.user_tg);
   const kb = new InlineKeyboard();
   for (let i = 1; i <= 5; i++) kb.text("⭐".repeat(i), `rate:${ticket.id}:${i}`);
-  await api.sendMessage(
-    ticket.user_tg,
-    `${t(lang, "ticket_closed", { id: ticket.id, biz: config.BUSINESS_NAME })}\n\n${t(lang, "rate_prompt")}`,
-    { reply_markup: kb.row().text(t(lang, "btn_home"), "menu:home") },
-  ).catch(() => {});
+  const text = `${t(lang, "ticket_closed", { id: ticket.id, biz: config.BUSINESS_NAME })}\n\n${t(lang, "rate_prompt")}`;
+  const replyMarkup = kb.row().text(t(lang, "btn_home"), "menu:home");
+  const image = mascot("celebrating");
+  if (image) await api.sendPhoto(ticket.user_tg, image, { caption: text, reply_markup: replyMarkup }).catch(() => {});
+  else await api.sendMessage(ticket.user_tg, text, { reply_markup: replyMarkup }).catch(() => {});
 }

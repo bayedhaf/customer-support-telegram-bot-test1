@@ -9,6 +9,7 @@ import { FAQ, searchFaq } from "./faq.js";
 import { LANGS, t, type Key } from "./i18n.js";
 import { closeAndNotify, esc, relayAgentToCustomer, relayCustomerToStaff } from "./relay.js";
 import { createTicketFlow, type MyContext } from "./ticketFlow.js";
+import { mascot } from "./mascot.js";
 
 export const bot = new Bot<MyContext>(
   config.BOT_TOKEN,
@@ -42,8 +43,15 @@ const backKb = (ctx: Context) => new InlineKeyboard().text(T(ctx, "btn_back"), "
 
 async function showHome(ctx: Context, edit = false) {
   const text = T(ctx, "welcome", { biz: config.BUSINESS_NAME });
-  if (edit) await ctx.editMessageText(text, { reply_markup: mainMenu(ctx) }).catch(() => {});
-  else await ctx.reply(text, { reply_markup: mainMenu(ctx) });
+  const replyMarkup = mainMenu(ctx);
+  if (edit) {
+    const editedCaption = await ctx.editMessageCaption({ caption: text, reply_markup: replyMarkup }).then(() => true).catch(() => false);
+    if (!editedCaption) await ctx.editMessageText(text, { reply_markup: replyMarkup }).catch(() => {});
+    return;
+  }
+  const image = mascot("happy");
+  if (image) await ctx.replyWithPhoto(image, { caption: text, reply_markup: replyMarkup });
+  else await ctx.reply(text, { reply_markup: replyMarkup });
 }
 
 // ---------- customer: commands & menu ----------
@@ -183,9 +191,14 @@ bot.on("message").filter(isPrivate, async (ctx) => {
   const match = ctx.msg.text ? searchFaq(ctx.msg.text, lang) : undefined;
   const kb = new InlineKeyboard().text(T(ctx, "btn_still_help"), "menu:ticket");
   if (match) {
-    await ctx.reply(`${T(ctx, "faq_match")}\n\n<b>${esc(match.q[lang])}</b>\n${esc(match.a[lang])}`, { parse_mode: "HTML", reply_markup: kb });
+    const text = `${T(ctx, "faq_match")}\n\n<b>${esc(match.q[lang])}</b>\n${esc(match.a[lang])}`;
+    const image = mascot("thinking");
+    if (image) await ctx.replyWithPhoto(image, { caption: text, parse_mode: "HTML", reply_markup: kb });
+    else await ctx.reply(text, { parse_mode: "HTML", reply_markup: kb });
   } else {
-    await ctx.reply(T(ctx, "faq_nomatch"), { reply_markup: kb });
+    const image = mascot("apologizing");
+    if (image) await ctx.replyWithPhoto(image, { caption: T(ctx, "faq_nomatch"), reply_markup: kb });
+    else await ctx.reply(T(ctx, "faq_nomatch"), { reply_markup: kb });
   }
 });
 
