@@ -47,9 +47,6 @@ async function showHome(ctx: Context, edit = false) {
 }
 
 // ---------- customer: commands & menu ----------
-// Temporary helper to find the staff group ID. Delete this line when done.
-bot.command("id", (ctx) => ctx.reply(`Chat ID: ${ctx.chat.id}`));
-
 bot.command("start", async (ctx) => {
   if (!isPrivate(ctx)) return;
   await ctx.conversation.exitAll();
