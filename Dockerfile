@@ -17,7 +17,6 @@ ENV NODE_ENV=production
 ENV DATABASE_PATH=/app/data/support.db
 ENV PORT=3000
 
-VOLUME ["/app/data"]
 EXPOSE 3000
 
 USER node
