@@ -67,7 +67,7 @@ export async function closeAndNotify(api: Api, ticket: db.Ticket, closedBy: stri
   for (let i = 1; i <= 5; i++) kb.text("⭐".repeat(i), `rate:${ticket.id}:${i}`);
   await api.sendMessage(
     ticket.user_tg,
-    `${t(lang, "ticket_closed", { id: ticket.id })}\n${t(lang, "rate_prompt")}`,
-    { reply_markup: kb.row() },
+    `${t(lang, "ticket_closed", { id: ticket.id, biz: config.BUSINESS_NAME })}\n\n${t(lang, "rate_prompt")}`,
+    { reply_markup: kb.row().text(t(lang, "btn_home"), "menu:home") },
   ).catch(() => {});
 }

@@ -69,7 +69,7 @@ await send(CUSTOMER, CUSTOMER.id, "I was charged twice for order 1234");
 await tap(CUSTOMER, CUSTOMER.id, "skip");
 const staffPost = last("sendMessage", STAFF);
 check("ticket posted to staff group", !!staffPost?.payload.text.includes("Ticket #1"));
-check("customer got confirmation", !!last("sendMessage", CUSTOMER.id)?.payload.text.includes("Ticket #1 created"));
+check("customer got confirmation", !!last("sendMessage", CUSTOMER.id)?.payload.text.includes("request #1"));
 const ticket = db.getTicket(1)!;
 check("ticket saved as open with staff msg id", ticket.status === "open" && !!ticket.staff_msg_id);
 
@@ -88,7 +88,7 @@ await send(AGENT, STAFF, "/stats");
 check("/stats works in staff group", !!last("sendMessage", STAFF)?.payload.text.includes("Support stats"));
 await tap(AGENT, STAFF, "close:1");
 check("ticket closed", db.getTicket(1)!.status === "closed");
-check("customer asked for rating", !!last("sendMessage", CUSTOMER.id)?.payload.text.includes("closed"));
+check("customer asked for rating", !!last("sendMessage", CUSTOMER.id)?.payload.text.includes("How would you rate"));
 
 // 7. rating
 await tap(CUSTOMER, CUSTOMER.id, "rate:1:5");
