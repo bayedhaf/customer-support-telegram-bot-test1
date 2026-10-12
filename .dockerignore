@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log*
+.env
+support.db
+support.db-shm
+support.db-wal
+.git
+.gitignore
+Dockerfile
+README.md
